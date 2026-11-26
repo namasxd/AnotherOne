@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEDIS Flow · Administración PC</title>
+<style>
+:root{--bg:#e8ebef;--cd:#fff;--tx:#14202b;--mu:#566372;--bd:#cfd6de;--ac:#0b5fa5;--ok:#1b7f45;--wr:#a86400;--er:#b3261e;--hi:#fff3cf;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#10161d;--cd:#19212b;--tx:#e6ebf1;--mu:#93a1b1;--bd:#2b3643;--ac:#5aaaf0;--ok:#4cc17f;--wr:#e5b04f;--er:#ef7b6e;--hi:#3a3118}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{padding:18px 24px 0;max-width:1400px;margin:auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+h1{font-size:26px;margin:0 0 2px}h2{font-size:20px;margin:0 0 10px}p.s{color:var(--mu);margin:0 0 12px}
+#sync-panel{font-size:13px;padding:8px 14px;background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--mu)}
+#sync-panel.on{color:var(--ok);border-color:var(--ok)}
+#sync-panel.err{color:var(--er);border-color:var(--er)}
+nav{display:flex;gap:4px;flex-wrap:wrap;max-width:1400px;margin:12px auto 0;padding:0 24px;border-bottom:2px solid var(--bd)}
+nav button{background:none;border:0;padding:12px 16px;font-weight:600;font-size:15px;font-family:inherit;color:var(--mu);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav button.on{color:var(--ac);border-color:var(--ac)}
+main{max-width:1400px;margin:auto;padding:18px 24px 60px}
+.pn{display:none}.pn.on{display:block}
+.cd{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:20px;margin-bottom:14px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+label{display:flex;flex-direction:column;font-size:14px;color:var(--mu);gap:3px}
+input,select{font:inherit;padding:9px 10px;border:1px solid var(--bd);border-radius:4px;background:var(--bg);color:var(--tx);min-width:0}
+input[type=number]{width:110px}
+button.b{font-weight:600;font-size:15px;font-family:inherit;background:var(--ac);color:#fff;border:0;border-radius:6px;padding:10px 18px;cursor:pointer;min-height:44px}
+button.b.g{background:none;color:var(--ac);border:1px solid var(--ac)}button.b:disabled{opacity:.4;cursor:not-allowed}
+.msg{margin-top:8px;font-weight:600}.er{color:var(--er)}.ok{color:var(--ok)}.wr{color:var(--wr)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}th{color:var(--mu);font-weight:600}
+td.n,th.n{text-align:right}
+.gr{display:grid;grid-template-columns:90px repeat(10,minmax(64px,1fr));gap:2px;font-size:12px;min-width:740px}
+.gr div{padding:8px 3px;text-align:center;background:var(--bg);border-radius:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gr .o{background:var(--ac);color:#fff;font-weight:600}.gr .h{background:none;color:var(--mu)}
+.lb{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.lbl{border:2px dashed var(--bd);border-radius:4px;padding:8px;display:flex;gap:8px;font-size:11px;line-height:1.3}
+.lbl .q{background:#fff;padding:3px;flex:none}
+.bar{height:9px;background:var(--bg);border-radius:5px;overflow:hidden;min-width:90px}.bar i{display:block;height:100%;background:var(--wr)}.bar i.f{background:var(--ok)}
+.kp{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.kp div{flex:1;min-width:150px;background:var(--hi);border-radius:6px;padding:10px 12px}.kp b{display:block;font-size:22px}
+#log{max-height:280px;overflow:auto;font-size:13px}#log div{padding:4px 0;border-bottom:1px solid var(--bd)}
+#rel{background:#fff;color:#000;border:2px solid #000;padding:16px;margin-top:12px}#rel table{color:#000}#rel th,#rel td{border-color:#999}
+#pl{display:none}
+.rackmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px}.rackmap button{padding:12px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);cursor:pointer;min-height:64px;font-size:14px}.rackmap button.hot{border:2px solid var(--er)}.task{padding:12px;border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:center;flex-wrap:wrap}.task>div{flex:1;min-width:180px}.forecast{display:flex;align-items:end;gap:5px;height:180px;border-bottom:1px solid var(--bd);margin:16px 0}.forecast>div{flex:1;min-width:0;text-align:center;font-size:10px}.forecast i{display:block;background:var(--ac);border-radius:3px 3px 0 0;margin:0 auto;width:75%}.forecast i.hot{background:var(--er)}.forecast span{display:block}.pill{display:inline-block;padding:3px 8px;border-radius:10px;background:var(--hi);font-size:12px}.opnote{padding:10px;background:var(--hi);border-radius:5px;margin:8px 0}
+@media print{body *{visibility:hidden}body.pt-rel #rel,body.pt-rel #rel *,body.pt-lb #pl,body.pt-lb #pl *{visibility:visible}body.pt-rel #rel,body.pt-lb #pl{position:absolute;left:0;top:0;width:100%;border:0}body.pt-lb #pl{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;background:#fff;color:#000}#pl .lbl{border-color:#000;break-inside:avoid;font-size:12px}}
+</style></head><body>
+<header>
+<div><h1>CEDIS Flow · Administración</h1><p class="s">Panel de escritorio · Compras, citas, recepción, embarques, análisis</p></div>
+<div id="sync-panel" title="Sincronización con la tablet">⚪ Iniciando…</div>
+</header>
+<div class="row" style="max-width:1400px;margin:8px auto 0;padding:0 24px">
+<button class="b g" onclick="seed()">Cargar escenario demo</button>
+<button class="b g" onclick="resetAll()">Reiniciar datos</button>
+</div>
+<nav id="nv" aria-label="Módulos"></nav>
+<main>
+<section class="pn" id="p0">
+<div class="cd"><h2>Agendar entrega</h2>
+<div class="row">
+<label>Proveedor<input id="a-p" placeholder="Nombre"></label>
+<label>Orden de compra<input id="a-o" placeholder="OC-1001"></label>
+<label>Folio de factura<input id="a-f" placeholder="F-2045"></label>
+<label>Andén<select id="a-a"></select></label>
+<label>Hora de inicio<select id="a-i"></select></label>
+<label>Duración (h)<input id="a-d" type="number" min="1" max="10" value="1"></label>
+<button class="b" onclick="uiCita()">Agendar</button></div>
+<div id="a-m" class="msg"></div></div>
+<div class="cd"><h2>Caseta · verificar acceso de la unidad</h2>
+<div class="row"><label style="flex:1;min-width:220px">OC o folio de factura<input id="c-q" placeholder="OC-1003 o F-2003" onkeydown="if(event.key==='Enter')uiCaseta()"></label><button class="b" onclick="uiCaseta()">Consultar acceso</button></div>
+<div id="c-m" class="msg"></div></div>
+<div class="cd"><h2>Ocupación de andenes de recibo</h2><div class="kp" id="a-k"></div><div class="tw"><div class="gr" id="a-g"></div></div></div>
+</section>
+<section class="pn" id="p1">
+<div class="cd"><h2>Factura por bulto y etiquetas QR</h2>
+<div class="row">
+<label>OC<select id="b-o" onchange="rBul()"></select></label>
+<label>SKU<input id="b-s" value="SKU-100"></label>
+<label>Producto<input id="b-r" value="Aceite 1 L"></label>
+<label>Sucursal (1-32)<input id="b-u" type="number" min="1" max="32" value="1"></label>
+<label>Piezas<input id="b-n" type="number" min="1" value="12"></label>
+<label>Peso kg<input id="b-k" type="number" min="0.1" step="0.1" value="14"></label>
+<label>Volumen m³<input id="b-v" type="number" min="0.01" step="0.01" value="0.12"></label>
+<button class="b" onclick="uiBul()">Agregar bulto</button><button class="b g" onclick="printLabels()">Imprimir etiquetas</button></div>
+<div id="b-m" class="msg"></div>
+<p class="s" style="margin-top:8px">Cada bulto mantiene un solo producto. El proveedor descarga la etiqueta y la pega.</p>
+<div class="lb" id="b-l"></div><div id="b-t" class="s"></div></div>
+</section>
+<section class="pn" id="p2">
+<div class="cd"><h2>Recepción en andén</h2>
+<div class="row">
+<label>OC en descarga<select id="r-o" onchange="rRec()"></select></label>
+<label style="flex:1;min-width:220px">Escaneo QR (lector o contenido pegado)<input id="r-i" placeholder="Escanea o pega el QR" onkeydown="if(event.key==='Enter')uiScan()"></label>
+<button class="b" onclick="uiScan()">Validar QR</button>
+<button class="b g" onclick="demoScan()">Simular escaneo</button>
+<button class="b g" onclick="demoIntruso()">Simular bulto no solicitado</button>
+<button class="b g" onclick="recTodo()">Recibir todo</button></div>
+<p class="s" style="margin-top:8px">La cámara para escanear está en la tablet Flutter del operador. Aquí puedes validar manualmente.</p>
+<div class="kp" id="r-k" style="margin-top:12px"></div><div id="log"></div></div>
+</section>
+<section class="pn" id="p3">
+<div class="cd"><h2>Almacenamiento temporal y embarques</h2>
+<p class="s">Un camión por sucursal (tortón: 12 tarimas, 12 t). No sale con menos de 90 % de peso o volumen.</p>
+<div class="tw"><table id="e-t"></table></div><div id="e-m" class="msg"></div></div>
+<div id="rel" style="display:none"></div><button class="b" id="pr" style="display:none;margin-top:8px" onclick="doPrint('rel')">Imprimir o guardar PDF</button>
+</section>
+<section class="pn" id="p4">
+<div class="cd"><h2>Cotización (precios de referencia en MXN, validar con proveedor)</h2><div class="tw"><table id="c-t"></table></div></div>
+<div class="cd"><h2>Costos recurrentes y viabilidad</h2><div class="row" id="c-p"></div><div class="kp" id="c-k" style="margin-top:12px"></div><div class="tw"><table id="c-r"></table></div>
+<p class="s">Supuestos editables. El ahorro por camiones consolidados es una estimación: ajústala con datos reales del CEDIS.</p></div>
+</section>
+<section class="pn" id="p5"><div class="cd"><h2>Centro de control operativo</h2><p class="s">Recepción → validación QR → tarea de montacargas → confirmación de ubicación o cross-docking → carga → salida.</p><div class="row"><label>OC de llegada<select id="op-oc"></select></label><button class="b" onclick="arrival()">Registrar llegada</button><button class="b g" onclick="openReception()">Validar QR en recepción</button></div><div id="op-msg" class="msg"></div></div><div class="cd"><h2>Tareas de movimiento</h2><p class="s">Las recomendaciones no equivalen a movimientos físicos. La tablet del operador confirma cada tarea.</p><div id="tasks"></div></div><div class="cd"><h2>Mapa operativo · 32 racks</h2><div id="rackmap" class="rackmap"></div><div id="rackdetail"></div></div><div class="cd"><h2>Preparación y selección de vehículo</h2><label>Sucursal<select id="op-suc" onchange="rVehicles()"></select></label><div id="vehicleplan"></div><p class="s">Capacidades ilustrativas. Verificar estiba, dimensiones y disponibilidad real antes de salida.</p></div></section>
+<section class="pn" id="p6"><div class="cd"><h2>Predicción de saturación</h2><p class="s">Proyección determinista del día: entradas pendientes al fin de la cita y salidas previstas configurables.</p><div class="row"><label>Hora actual del escenario<select id="pred-now" onchange="rPredict()"></select></label><label>Umbral alerta %<input id="pred-th" type="number" min="1" max="100" value="85" onchange="rPredict()"></label><label>Salida prevista · sucursal<select id="pred-suc"></select></label><label>Hora salida<select id="pred-out"></select></label><button class="b" onclick="planOut()">Planificar salida</button><button class="b g" onclick="demoForecast()">Cargar caso de saturación</button></div><div id="pred-plans"></div><div id="pred-k" class="kp"></div><div id="pred-chart"></div><div id="pred-alerts"></div></div></section>
+<section class="pn" id="p7"><div class="cd"><h2>Simulador de operaciones logísticas</h2><p class="s">Compara un escenario base y otro propuesto sin modificar el inventario real. Modelo de cola determinista.</p><div class="row" id="sim-inputs"></div><button class="b" onclick="rSim()">Simular escenarios</button><div id="sim-results"></div></div></section>
+</main>
+<div id="pl"></div>
+<script>
+/* QR offline (idéntico al original) */
+var QRCode=(function(){var EXP=new Array(256),LOG=new Array(256);for(var i=0;i<8;i++)EXP[i]=1<<i;for(var i=8;i<256;i++)EXP[i]=EXP[i-4]^EXP[i-5]^EXP[i-6]^EXP[i-8];for(var i=0;i<255;i++)LOG[EXP[i]]=i;function gmul(a,b){if(a===0||b===0)return 0;return EXP[(LOG[a]+LOG[b])%255]}function genPoly(d){var p=[1];for(var i=0;i<d;i++){var np=new Array(p.length+1).fill(0);for(var j=0;j<p.length;j++){np[j]^=p[j];np[j+1]^=gmul(p[j],EXP[i])}p=np}return p}function rsEncode(data,ecLen){var gen=genPoly(ecLen);var res=data.slice().concat(new Array(ecLen).fill(0));for(var i=0;i<data.length;i++){var c=res[i];if(c!==0){for(var j=0;j<gen.length;j++)res[i+j]^=gmul(gen[j],c)}}return res.slice(data.length)}var VERSIONS=[null,[26,7,1,[]],[44,10,1,[6,18]],[70,15,1,[6,22]],[100,20,1,[6,26]],[134,26,1,[6,30]],[172,18,2,[6,34]],[196,20,2,[6,22,38]],[242,24,2,[6,24,42]],[292,30,2,[6,26,46]],[346,18,4,[6,28,50]]];function getBytes(str){var u=unescape(encodeURIComponent(str));var a=[];for(var i=0;i<u.length;i++)a.push(u.charCodeAt(i));return a}function buildMatrix(text){var bytes=getBytes(text);var ver=1;for(;ver<=10;ver++){var cap=VERSIONS[ver][0]-VERSIONS[ver][1]*VERSIONS[ver][2];var hdr=ver<10?2:3;if(bytes.length+hdr<=cap)break}if(ver>10)ver=10;var info=VERSIONS[ver];var totalCW=info[0],ecPerBlock=info[1],blocks=info[2],aligns=info[3];var dataCW=totalCW-ecPerBlock*blocks;var bits=[];function pushBits(v,l){for(var i=l-1;i>=0;i--)bits.push((v>>i)&1)}pushBits(4,4);pushBits(bytes.length,ver<10?8:16);for(var i=0;i<bytes.length&&(bits.length/8)<dataCW;i++)pushBits(bytes[i],8);while(bits.length%8!==0)bits.push(0);var pad=[0xEC,0x11],pi=0;while(bits.length<dataCW*8){pushBits(pad[pi%2],8);pi++}var cw=[];for(var i=0;i<bits.length;i+=8){var b=0;for(var j=0;j<8;j++)b=(b<<1)|bits[i+j];cw.push(b)}var dB=[],eB=[];var sLen=Math.floor(dataCW/blocks),lCnt=dataCW%blocks,off=0;for(var b=0;b<blocks;b++){var len=sLen+(b>=blocks-lCnt?1:0);var db=cw.slice(off,off+len);off+=len;dB.push(db);eB.push(rsEncode(db,ecPerBlock))}var fcW=[];var maxD=sLen+(lCnt>0?1:0);for(var i=0;i<maxD;i++)for(var b=0;b<blocks;b++)if(i<dB[b].length)fcW.push(dB[b][i]);for(var i=0;i<ecPerBlock;i++)for(var b=0;b<blocks;b++)fcW.push(eB[b][i]);var size=ver*4+17;var mod=Array.from({length:size},()=>new Array(size).fill(null));var isF=Array.from({length:size},()=>new Array(size).fill(false));function setF(r,c,v){if(r>=0&&r<size&&c>=0&&c<size){mod[r][c]=v?1:0;isF[r][c]=true}}function drawF(r,c){for(var dr=-1;dr<=7;dr++)for(var dc=-1;dc<=7;dc++){var inB=dr>=0&&dr<=6&&dc>=0&&dc<=6;var onB=dr===0||dr===6||dc===0||dc===6;var inC=dr>=2&&dr<=4&&dc>=2&&dc<=4;setF(r+dr,c+dc,inB&&(onB||inC))}}drawF(0,0);drawF(0,size-7);drawF(size-7,0);for(var i=8;i<size-8;i++){setF(6,i,i%2===0);setF(i,6,i%2===0)}for(var i=0;i<aligns.length;i++)for(var j=0;j<aligns.length;j++){var ar=aligns[i],ac=aligns[j];if(isF[ar][ac])continue;for(var dr=-2;dr<=2;dr++)for(var dc=-2;dc<=2;dc++)setF(ar+dr,ac+dc,Math.abs(dr)===2||Math.abs(dc)===2||(dr===0&&dc===0))}for(var i=0;i<9;i++){if(!isF[8][i])setF(8,i,0);if(!isF[i][8])setF(i,8,0)}for(var i=0;i<8;i++){setF(8,size-1-i,0);setF(size-1-i,8,0)}setF(size-8,8,1);if(ver>=7){var vB=[0,0,0,0,0,0,0,0x07C94,0x085BC,0x09A99,0x0A4D3][ver];for(var i=0;i<18;i++){var bit=(vB>>i)&1;var a=Math.floor(i/3),b=i%3;setF(a,size-11+b,bit);setF(size-11+b,a,bit)}}var allB=[];for(var i=0;i<fcW.length;i++)for(var b=7;b>=0;b--)allB.push((fcW[i]>>b)&1);var bi=0,up=true;for(var col=size-1;col>=1;col-=2){if(col===6)col--;for(var step=0;step<size;step++){var row=up?size-1-step:step;for(var dx=0;dx<2;dx++){var c=col-dx;if(!isF[row][c]){var bit=bi<allB.length?allB[bi++]:0;if((row+c)%2===0)bit^=1;mod[row][c]=bit}}}up=!up}var fmt=0x77C4;for(var i=0;i<=5;i++)setF(8,i,(fmt>>i)&1);setF(8,7,(fmt>>6)&1);setF(8,8,(fmt>>7)&1);setF(7,8,(fmt>>8)&1);for(var i=9;i<=14;i++)setF(14-i,8,(fmt>>i)&1);for(var i=0;i<=7;i++)setF(size-1-i,8,(fmt>>i)&1);for(var i=8;i<=14;i++)setF(8,size-15+i,(fmt>>i)&1);return mod}function QR(el,opts){if(typeof el==='string')el=document.getElementById(el);if(!el)return;var text=typeof opts==='string'?opts:(opts.text||'');var w=(opts&&opts.width)||148;var h=(opts&&opts.height)||148;var mod=buildMatrix(text);var n=mod.length;var pad=2;var total=n+pad*2;var rects='';for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(mod[r][c])rects+='<rect x="'+(c+pad)+'" y="'+(r+pad)+'" width="1" height="1"/>';el.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+total+' '+total+'" width="'+w+'" height="'+h+'" shape-rendering="crispEdges" style="display:block;background:#fff"><g fill="#000">'+rects+'</g></svg>'}QR.CorrectLevel={L:1,M:0,Q:3,H:2};return QR})();
+</script>
+<script>
+const $=s=>document.querySelector(s),M=n=>'$'+Math.round(n).toLocaleString('es-MX'),sum=(a,k)=>a.reduce((t,x)=>t+x[k],0);
+const STORAGE_KEY='cedis_flow_offline_v1';
+const S={citas:[],ocs:{},rec:{},log:[],emb:[]},CV=12*1.12*1.15*1.85*0.8,TABS=['Agendar','Etiquetas','Recepción','Embarque','Costo y viabilidad','Operación','Predicción','Simulador'];
+let seq=0;
+/* Precios de referencia de mercado a 2026 (MXN, antes de IVA). Validar con proveedor antes de contratar. */
+const COT=[['Red','AP industrial Wi-Fi 6, IP67, antena externa',10,12000],['Red','Switch PoE+ 24 puertos administrable',2,15000],['Red','Cableado, canalización y puesta en marcha (lote)',1,35000],['Captura','Handheld Android rudo 2D, caída 1.5 m',8,18000],['Captura','Base de carga',4,3200],['Impresión','Impresora láser en red para Relaciones de embarque',3,8000],['Servidor','Servidor local (mini PC) con UPS para backend y panel — estimación a validar',1,18000],['Servicio','Implementación y capacitación (lote)',1,45000]];
+const P={emb:20,pag:3,dias:26,viaje:3500,red:5,err:12000};
+function saveState(){try{const r={};for(const k in S.rec)r[k]=[...S.rec[k]];localStorage.setItem(STORAGE_KEY,JSON.stringify({citas:S.citas,ocs:S.ocs,rec:r,log:S.log,emb:S.emb,seq,cot:COT,cotv:3,p:P}))}catch(e){}}
+function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;const d=JSON.parse(raw);S.citas=d.citas||[];S.ocs=d.ocs||{};S.log=d.log||[];S.emb=d.emb||[];seq=d.seq||0;S.rec={};if(d.rec)for(const k in d.rec)S.rec[k]=new Set(d.rec[k]);if(d.cotv===3&&Array.isArray(d.cot)&&d.cot.length===COT.length)d.cot.forEach((c,i)=>{COT[i][2]=c[2];COT[i][3]=c[3]});if(d.p&&typeof d.p==='object')Object.assign(P,d.p)}catch(e){}}
+function resetAll(){localStorage.removeItem(STORAGE_KEY);location.reload()}
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function doPrint(m){document.body.classList.add('pt-'+m);window.print()}
+window.addEventListener('afterprint',()=>document.body.classList.remove('pt-rel','pt-lb'));
+function go(i){document.querySelectorAll('.pn').forEach((p,j)=>p.classList.toggle('on',i===j));document.querySelectorAll('#nv button').forEach((b,j)=>b.classList.toggle('on',i===j));render()}
+$('#nv').innerHTML=TABS.map((t,i)=>`<button onclick="go(${i})">${t}</button>`).join('');
+$('#a-a').innerHTML=[1,2,3,4].map(a=>`<option>${a}</option>`).join('');
+$('#a-i').innerHTML=[8,9,10,11,12,13,14,15,16,17].map(h=>`<option value="${h}">${h}:00</option>`).join('');
+function addCita(c){if(!c.prov||!c.oc||!c.fol)return'Completa proveedor, OC y folio.';if(!/^[A-Za-z0-9_-]+$/.test(c.oc))return'OC: solo letras, números y guion.';if(S.ocs[c.oc])return'Esa OC ya está agendada.';if(S.citas.some(x=>x.fol===c.fol))return'El folio de factura ya existe.';if(!Number.isInteger(c.dur)||c.dur<1||c.ini+c.dur>18)return'Duración mínima 1 h, terminar antes de 18:00.';if(S.citas.some(x=>x.and===c.and&&c.ini<x.ini+x.dur&&x.ini<c.ini+c.dur))return'Ese andén ya tiene una entrega en ese horario.';S.citas.push(c);S.ocs[c.oc]={...c,bultos:[]};return null}
+function uiCita(){const e=addCita({prov:$('#a-p').value.trim(),oc:$('#a-o').value.trim(),fol:$('#a-f').value.trim(),and:+$('#a-a').value,ini:+$('#a-i').value,dur:+$('#a-d').value});$('#a-m').className='msg '+(e?'er':'ok');$('#a-m').textContent=e||'Cita agendada.';render()}
+function uiCaseta(){const q=$('#c-q').value.trim().toLowerCase(),m=$('#c-m');if(!q){m.className='msg er';m.textContent='Captura una OC o un folio.';return}
+const c=S.citas.find(x=>x.oc.toLowerCase()===q||x.fol.toLowerCase()===q);
+if(!c){m.className='msg er';m.textContent='Acceso rechazado: no existe cita para "'+$('#c-q').value.trim()+'".';return}
+m.className='msg ok';m.textContent='Acceso autorizado: '+c.prov+' · '+c.oc+' · andén '+c.and+' · '+c.ini+':00 a '+(c.ini+c.dur)+':00.'}
+function addBulto(oc,b){const o=S.ocs[oc];b.id=`B-${oc}-${String(++seq).padStart(4,'0')}`;b.oc=oc;o.bultos.push(b);return b}
+const payload=b=>JSON.stringify({b:b.id,oc:b.oc,p:S.ocs[b.oc].prov,s:b.suc,sku:b.sku,n:b.n});
+function uiBul(){const oc=$('#b-o').value;if(!oc){$('#b-m').className='msg er';$('#b-m').textContent='Agenda primero una OC.';return}const suc=+$('#b-u').value;if(suc<1||suc>32){$('#b-m').className='msg er';$('#b-m').textContent='Sucursal 1-32.';return}const sku=$('#b-s').value.trim(),prod=$('#b-r').value.trim(),n=+$('#b-n').value,kg=+$('#b-k').value,m3=+$('#b-v').value;if(!sku||!prod||!(n>=1)||!(kg>0)||!(m3>0)){$('#b-m').className='msg er';$('#b-m').textContent='Completa SKU, producto, piezas, peso y volumen.';return}const bad=m=>{$('#b-m').className='msg er';$('#b-m').textContent=m};
+if(kg>1000||m3>CV/12+1e-9){bad('Regla 4: un bulto no puede exceder 1,000 kg ni 1.91 m³ (capacidad de la tarima).');return}
+const clash=allB().find(x=>x.sku===sku&&x.prod.trim().toLowerCase()!==prod.toLowerCase());
+if(clash){bad('Regla 3: el SKU '+sku+' ya está asociado a "'+clash.prod+'"; no se mezclan productos.');return}
+addBulto(oc,{sku,prod,suc,n,kg,m3});$('#b-m').className='msg';$('#b-m').textContent='';render()}
+function mkLabel(b,o){const d=document.createElement('div');d.className='lbl';const q=document.createElement('div');q.className='q';d.appendChild(q);const t=document.createElement('div');t.innerHTML=`<b>${esc(b.id)}</b><br>OC ${esc(b.oc)}<br>${esc(o.prov)}<br>Sucursal ${b.suc}<br>${esc(b.sku)} · ${b.n} pzas`;d.appendChild(t);try{new QRCode(q,{text:payload(b),width:148,height:148,correctLevel:QRCode.CorrectLevel.L})}catch(e){q.textContent='QR'}return d}
+function rBul(){const oc=$('#b-o').value,o=S.ocs[oc],box=$('#b-l');box.innerHTML='';if(!o)return;o.bultos.slice(-12).forEach(b=>box.appendChild(mkLabel(b,o)));$('#b-t').textContent=`${o.bultos.length} bultos · ${sum(o.bultos,'kg').toFixed(0)} kg · ${sum(o.bultos,'m3').toFixed(1)} m³`+(o.bultos.length>12?' (últimas 12 en pantalla)':'')}
+function printLabels(){const o=S.ocs[$('#b-o').value],pl=$('#pl');if(!o||!o.bultos.length){$('#b-m').className='msg er';$('#b-m').textContent='No hay bultos.';return}pl.innerHTML='';o.bultos.forEach(b=>pl.appendChild(mkLabel(b,o)));doPrint('lb')}
+function scan(raw,oc){const o=S.ocs[oc];let d;try{d=JSON.parse(raw)}catch{d=null}if(!d||typeof d!=='object')d={b:raw.trim()};const r=S.rec[oc]??=new Set(),b=o.bultos.find(x=>x.id===d.b);let x;if((d.oc&&d.oc!==oc)||!b)x=['er','Rechazado: mercancía no solicitada en esta OC',d.b||raw];else if(r.has(b.id))x=['er','Rechazado: excedente, ya fue recibido',b.id];else if((d.sku&&d.sku!==b.sku)||(d.n&&d.n!==b.n)||(d.s&&d.s!==b.suc))x=['er','Rechazado: no coincide con la factura',b.id];else{r.add(b.id);x=['ok',`Recibido y asignado al rack de la sucursal ${b.suc}`,b.id]}x.push(oc);S.log.unshift(x);saveState();pushScanToBackend(b)}
+async function pushScanToBackend(b){if(!b||SYNCING||!received(b))return;try{await fetch(SYNC_URL+'/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:b.id,source:'panel'}),signal:AbortSignal.timeout(2500)})}catch(e){}}
+function uiScan(){const oc=$('#r-o').value,v=$('#r-i').value.trim();if(!oc||!v)return;scan(v,oc);$('#r-i').value='';rRec()}
+function demoScan(){const oc=$('#r-o').value,o=S.ocs[oc],r=S.rec[oc]||new Set(),b=o&&o.bultos.find(x=>!r.has(x.id));if(b){scan(payload(b),oc);rRec()}}
+function demoIntruso(){const oc=$('#r-o').value,o=S.ocs[oc];if(!o||!o.bultos[0])return;scan(JSON.stringify({b:'B-X-9999',oc,p:o.prov,s:1,sku:'SKU-999',n:5}),oc);rRec()}
+function recTodo(){const oc=$('#r-o').value,o=S.ocs[oc];if(!o)return;o.bultos.forEach(b=>{if(!(S.rec[oc]||new Set()).has(b.id))scan(payload(b),oc)});rRec()}
+function rRec(){const oc=$('#r-o').value,o=S.ocs[oc];if(!o){$('#r-k').innerHTML='';$('#log').innerHTML='';return}const n=(S.rec[oc]||new Set()).size,t=o.bultos.length;$('#r-k').innerHTML=`<div><b>${t}</b>esperados</div><div><b>${n}</b>recibidos</div><div><b>${t-n}</b>faltantes</div><div><b>${S.log.filter(l=>l[3]===oc&&l[0]==='er').length}</b>rechazos</div>`;$('#log').innerHTML=S.log.filter(l=>l[3]===oc).slice(0,60).map(l=>`<div class="${l[0]}">${esc(l[2])} · ${l[1]}</div>`).join('')}
+function stock(){const m={};Object.values(S.ocs).forEach(o=>o.bultos.forEach(b=>{if((S.rec[o.oc]||new Set()).has(b.id)&&!b.sent)(m[b.suc]??=[]).push(b)}));return m}
+const fill=bs=>Math.max(sum(bs,'m3')/CV,sum(bs,'kg')/12000),tar=bs=>Math.max(Math.ceil(sum(bs,'m3')/(CV/12)-1e-9),Math.ceil(sum(bs,'kg')/1000));
+function rEmb(){const m=stock(),ks=Object.keys(m).sort((a,b)=>a-b);$('#e-t').innerHTML='<tr><th>Sucursal</th><th class="n">Bultos</th><th class="n">Tarimas</th><th class="n">Peso kg</th><th class="n">Vol. m³</th><th>Llenado del camión</th><th></th></tr>'+(ks.length?ks.map(s=>{const bs=m[s],f=fill(bs),ok=f>=.9;const tt=tar(bs);return`<tr><td>Rack ${s}</td><td class="n">${bs.length}</td><td class="n ${tt>32?'er':''}">${tt} / 32${tt>32?' ¡excedido!':''}</td><td class="n">${sum(bs,'kg').toFixed(0)}</td><td class="n">${sum(bs,'m3').toFixed(1)}</td><td><div class="bar"><i class="${ok?'f':''}" style="width:${Math.min(100,f*100)}%"></i></div>${(f*100).toFixed(0)} %</td><td><button class="b" ${ok?'':'disabled'} onclick="embarcar(${s})">Embarcar</button></td></tr>`}).join(''):'<tr><td colspan="7">Aún no hay mercancía recibida.</td></tr>')}
+function embarcar(s){const bs=stock()[s]||[];let take=[],kg=0,m3=0;bs.forEach(b=>{if((kg+b.kg)/12000<=1&&(m3+b.m3)/CV<=1){take.push(b);kg+=b.kg;m3+=b.m3}});if(take.length<1||Math.max(kg/12000,m3/CV)<.9){$('#e-m').className='msg er';$('#e-m').textContent='Con bultos que caben enteros el camión queda debajo de 90 %: no se puede embarcar.';return}$('#e-m').textContent='';take.forEach(b=>b.sent=1);const e={id:'EMB-'+String(S.emb.length+1).padStart(3,'0'),suc:s,take,kg,m3,fecha:new Date().toLocaleString('es-MX')};S.emb.push(e);saveState();const g={};take.forEach(b=>{const k=b.oc+'|'+b.sku;(g[k]??={oc:b.oc,sku:b.sku,prod:b.prod,bl:0,pz:0}).bl++;g[k].pz+=b.n});const r=$('#rel');r.style.display='block';$('#pr').style.display='inline-block';r.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px"><div><h2 style="margin:0">Relación ${e.id}</h2>Destino: sucursal ${s}<br>${e.fecha}<br>Llenado: ${(Math.max(kg/12000,m3/CV)*100).toFixed(0)} % · ${kg.toFixed(0)} kg · ${m3.toFixed(1)} m³ · ${tar(take)} tarimas</div><div id="rq"></div></div><table style="margin-top:10px"><tr><th>OC</th><th>SKU</th><th>Producto</th><th class="n">Bultos</th><th class="n">Piezas</th></tr>${Object.values(g).map(x=>`<tr><td>${esc(x.oc)}</td><td>${esc(x.sku)}</td><td>${esc(x.prod)}</td><td class="n">${x.bl}</td><td class="n">${x.pz}</td></tr>`).join('')}</table>`;try{new QRCode($('#rq'),{text:JSON.stringify({e:e.id,s,bultos:take.length,kg:Math.round(kg)}),width:96,height:96})}catch(x){}rEmb();r.scrollIntoView()}
+function rCot(){const inv=COT.reduce((t,c)=>t+c[2]*c[3],0);$('#c-t').innerHTML='<tr><th>Rubro</th><th>Concepto</th><th class="n">Cant.</th><th class="n">P. unitario</th><th class="n">Subtotal</th></tr>'+COT.map((c,i)=>`<tr><td>${c[0]}</td><td>${c[1]}</td><td class="n"><input type="number" min="0" value="${c[2]}" onchange="COT[${i}][2]=+this.value;rCot()"></td><td class="n"><input type="number" min="0" value="${c[3]}" onchange="COT[${i}][3]=+this.value;rCot()"></td><td class="n">${M(c[2]*c[3])}</td></tr>`).join('')+`<tr><th colspan="4">Inversión inicial</th><th class="n">${M(inv)}</th></tr>`;$('#c-p').innerHTML=[['emb','Embarques por día'],['pag','Páginas por relación'],['dias','Días operados al mes'],['viaje','Costo por viaje MXN'],['red','Viajes evitados %'],['err','Ahorro por errores MXN/mes']].map(([k,t])=>`<label>${t}<input type="number" min="0" value="${P[k]}" onchange="P.${k}=+this.value;rCot()"></label>`).join('');const hojas=P.emb*P.pag*P.dias,papel=hojas/500*130,toner=hojas/12000*3000,eq=COT.slice(0,7).reduce((t,c)=>t+c[2]*c[3],0)*.1/12,nube=1800,sop=1500,rec=papel+toner+eq+nube+sop,ah=P.emb*P.dias*P.red/100*P.viaje+P.err,neto=ah-rec;$('#c-r').innerHTML=`<tr><th>Concepto mensual</th><th class="n">MXN</th></tr><tr><td>Papel</td><td class="n">${M(papel)}</td></tr><tr><td>Tóner</td><td class="n">${M(toner)}</td></tr><tr><td>Mantenimiento equipo</td><td class="n">${M(eq)}</td></tr><tr><td>Respaldos y licencias</td><td class="n">${M(nube)}</td></tr><tr><td>Soporte</td><td class="n">${M(sop)}</td></tr><tr><th>Total recurrente</th><th class="n">${M(rec)}</th></tr>`;$('#c-k').innerHTML=`<div><b>${M(inv)}</b>inversión inicial</div><div><b>${M(rec)}</b>costo mensual</div><div><b>${M(ah)}</b>ahorro mensual estimado</div><div><b>${neto>0?(inv/neto).toFixed(1)+' meses':'No recupera'}</b>recuperación</div>`;saveState()}
+function rAg(){const g=$('#a-g');let h='<div class="h"></div>'+[8,9,10,11,12,13,14,15,16,17].map(x=>`<div class="h">${x}:00</div>`).join('');for(let a=1;a<=4;a++){h+=`<div class="h">Andén ${a}</div>`;for(let x=8;x<18;x++){const c=S.citas.find(c=>c.and===a&&x>=c.ini&&x<c.ini+c.dur);h+=c?`<div class="o" title="${esc(c.prov)}">${esc(c.oc)}</div>`:'<div></div>'}}g.innerHTML=h;const u=sum(S.citas,'dur');$('#a-k').innerHTML=`<div><b>${S.citas.length}</b>citas</div><div><b>${u} / 40 h</b>andén ocupado</div><div><b>${(u/40*100).toFixed(0)} %</b>utilización</div><div><b>35 camiones</b>exigen ≥ 35 h de 40 h disponibles</div>`}
+function opts(id,list){const el=$(id),v=el.value;el.innerHTML=list.map(o=>`<option>${esc(o)}</option>`).join('');if(list.includes(v))el.value=v}
+function render(){opts('#b-o',Object.keys(S.ocs));opts('#r-o',Object.keys(S.ocs).filter(k=>S.ocs[k].bultos.length));rAg();rBul();rRec();rEmb();rCot();saveState()}
+function seed(){if(S.citas.length)return;[['Distribuidora Golfo','OC-1001','F-2001',1,8,2],['Abarrotes del Puerto','OC-1002','F-2002',2,8,2],['Lácteos Jarocho','OC-1003','F-2003',3,9,1],['Frescos del Golfo','OC-1004','F-2004',4,10,1]].forEach(([prov,oc,fol,and,ini,dur])=>addCita({prov,oc,fol,and,ini,dur}));const mk=(oc,suc,n,sku,prod,kg,m3)=>{for(let i=0;i<n;i++)addBulto(oc,{sku,prod,suc,n:12,kg,m3})};mk('OC-1001',1,60,'SKU-100','Aceite 1 L',85,.19);mk('OC-1001',2,20,'SKU-110','Arroz 1 kg',40,.10);mk('OC-1002',1,60,'SKU-200','Refresco 600 ml',85,.19);mk('OC-1002',3,20,'SKU-210','Galletas',20,.12);mk('OC-1003',2,15,'SKU-300','Yogurt',30,.09);mk('OC-1004',4,24,'SKU-400','Leche',35,.11);go(5)}
+const OPSKEY='cedis_flow_ops_v2';let O={arrivals:{},moves:{},plans:[],events:[],now:10,threshold:85};const vehicles=[{name:'Rabón',kg:8000,m3:CV*8/12,p:8},{name:'Tortón',kg:12000,m3:CV,p:12},{name:'Unidad mayor',kg:16000,m3:CV*16/12,p:16}];let activeRack=0;
+function allB(){return Object.values(S.ocs).flatMap(o=>o.bultos)}function received(b){return (S.rec[b.oc]||new Set()).has(b.id)}
+function saveOps(){try{localStorage.setItem(OPSKEY,JSON.stringify(O))}catch(e){}}function loadOps(){try{const x=JSON.parse(localStorage.getItem(OPSKEY));if(x)O={...O,...x}}catch(e){};allB().filter(b=>received(b)&&!b.sent).forEach(b=>{if(!O.moves[b.id])O.moves[b.id]={state:'stored',rack:b.suc}});saveOps()}
+function evt(b,action){O.events.unshift({id:b.id,action,time:new Date().toLocaleString('es-MX')});saveOps()}
+function stored(r){return allB().filter(b=>received(b)&&!b.sent&&O.moves[b.id]?.state==='stored'&&O.moves[b.id].rack===r)}function reserved(r){return allB().filter(b=>received(b)&&!b.sent&&['stored','pending'].includes(O.moves[b.id]?.state)&&O.moves[b.id].rack===r)}
+function chooseRack(b){const order=[b.suc,...Array.from({length:32},(_,i)=>i+1).filter(r=>r!==b.suc)];return order.find(r=>tar([...reserved(r),b])<=32)||0}
+function selectLoad(bs,v){let take=[],kg=0,m3=0;[...bs].sort((a,b)=>Math.max(b.kg/v.kg,b.m3/v.m3)-Math.max(a.kg/v.kg,a.m3/v.m3)).forEach(b=>{if(kg+b.kg<=v.kg+1e-8&&m3+b.m3<=v.m3+1e-8){take.push(b);kg+=b.kg;m3+=b.m3}});return{v,take,kg,m3,f:Math.max(kg/v.kg,m3/v.m3)}}
+function bestLoad(bs){return vehicles.map(v=>selectLoad(bs,v)).sort((a,b)=>(b.f>=.9)-(a.f>=.9)||b.take.length-a.take.length||b.f-a.f)[0]}
+function ready(s){return allB().filter(b=>received(b)&&!b.sent&&b.suc===s&&['stored','staged'].includes(O.moves[b.id]?.state))}
+function advise(b){const current=ready(b.suc),before=bestLoad(current),after=bestLoad([...current,b]);if(after.f>=.9&&after.take.includes(b)&&before.f<.9)return{state:'cross',rack:0};return{state:'pending',rack:chooseRack(b)}}
+const oldScan=scan;scan=function(raw,oc){const before=new Set(S.rec[oc]||[]);oldScan(raw,oc);for(const id of S.rec[oc]||[]){if(!before.has(id)){const b=allB().find(x=>x.id===id);O.moves[id]=advise(b);evt(b,'Validado · '+(O.moves[id].state==='cross'?'cross-docking recomendado':'ubicación propuesta'));S.log[0][1]='Validado · tarea de movimiento pendiente';saveState()}}rOps();rPredict();pushState()};
+const oldStock=stock;stock=function(){const m=oldStock();for(const k of Object.keys(m))m[k]=m[k].filter(b=>['stored','staged'].includes(O.moves[b.id]?.state));return m};
+function arrival(){const oc=$('#op-oc').value;if(!oc)return;O.arrivals[oc]=new Date().toLocaleString('es-MX');saveOps();$('#op-msg').textContent='Llegada registrada: '+oc+' · andén '+S.ocs[oc].and;rOps()}
+function openReception(){const oc=$('#op-oc').value;if(!O.arrivals[oc]){$('#op-msg').textContent='Registra la llegada primero.';return}go(2);$('#r-o').value=oc;rRec()}
+function confirmMove(id){const b=allB().find(x=>x.id===id),m=O.moves[id];if(!b||!m||b.sent)return;if(m.state==='cross'){m.state='staged';evt(b,'Cross-docking confirmado')}else if(m.state==='pending'){if(!m.rack)m.rack=chooseRack(b);if(!m.rack){alert('No hay espacio estimado.');return}m.state='stored';evt(b,'Montacargas confirmó rack '+m.rack)}saveOps();render()}
+function divert(id){const b=allB().find(x=>x.id===id);if(!b||O.moves[id]?.state!=='cross')return;O.moves[id]={state:'pending',rack:chooseRack(b)};saveOps();rOps()}
+function stage(id){const b=allB().find(x=>x.id===id);if(!b||O.moves[id]?.state!=='stored'||b.sent)return;O.moves[id]={state:'staged',rack:0};evt(b,'Traslado a embarque confirmado');render()}
+function rOps(){if(!$('#op-oc'))return;opts('#op-oc',Object.keys(S.ocs));const tasks=allB().filter(b=>received(b)&&!b.sent&&['pending','cross'].includes(O.moves[b.id]?.state));$('#tasks').innerHTML=tasks.length?tasks.map(b=>{const m=O.moves[b.id];return`<div class="task"><div><b>${esc(b.id)}</b> · ${esc(b.prod)} · Sucursal ${b.suc}<br><span class="pill">${m.state==='cross'?'Cross-docking → embarque':m.rack?'Montacargas → Rack '+m.rack:'Sin capacidad'}</span></div><button class="b" onclick="confirmMove('${esc(b.id)}')">Confirmar traslado</button>${m.state==='cross'?`<button class="b g" onclick="divert('${esc(b.id)}')">Almacenar</button>`:''}</div>`}).join(''):'<p class="s">Sin tareas pendientes. Recibe bultos en la pestaña Recepción o espera a la tablet.</p>';$('#rackmap').innerHTML=Array.from({length:32},(_,i)=>{let r=i+1,n=tar(stored(r)),q=tar(reserved(r));return`<button class="${q>=28?'hot':''}" onclick="showRack(${r})"><b>Rack ${r}</b><br>${n}/32 tarimas est.<br><small>${q} con reservas</small></button>`}).join('');if(activeRack)showRack(activeRack);rVehicles()}
+function showRack(r){activeRack=r;const bs=stored(r);$('#rackdetail').innerHTML=`<h3>Rack ${r} · ${bs.length} bultos</h3>`+(bs.map(b=>`<div class="task"><div>${esc(b.id)} · ${esc(b.prod)} · Destino ${b.suc}</div><button class="b g" onclick="stage('${esc(b.id)}')">Traslado a embarque</button></div>`).join('')||'<p>Sin mercancía.</p>')}
+function rVehicles(){const s=+$('#op-suc').value;if(!s)return;const bs=ready(s),staged=bs.filter(b=>O.moves[b.id].state==='staged'),plans=vehicles.map(v=>selectLoad(bs,v)),best=bestLoad(bs);$('#vehicleplan').innerHTML=`<p>${bs.length} bultos disponibles · ${staged.length} en embarque.</p><div class="tw"><table><tr><th>Vehículo</th><th>Bultos</th><th>Peso</th><th>Volumen</th><th>Ocupación</th></tr>${plans.map(p=>`<tr><td>${p.v.name}${p.v===best.v?' ★':''}</td><td>${p.take.length}</td><td>${p.kg.toFixed(0)} / ${p.v.kg}</td><td>${p.m3.toFixed(2)} / ${p.v.m3.toFixed(2)}</td><td>${(100*p.f).toFixed(1)}%</td></tr>`).join('')}</table></div><p class="s">★ Prioriza cumplir 90%. Selección voraz, no óptimo garantizado.</p><button class="b" ${best.f>=.9?'':'disabled'} onclick="prepareBest(${s})">Preparar vehículo</button><div id="prep"></div>`}
+function prepareBest(s){const p=bestLoad(ready(s));$('#prep').innerHTML=`<div class="opnote"><b>${p.v.name} · ${p.take.length} bultos</b><p>${p.take.filter(b=>O.moves[b.id].state!=='staged').length} bultos deben trasladarse.</p><div class="tw"><table><tr><th>Bulto</th><th>Origen</th></tr>${p.take.map(b=>`<tr><td>${esc(b.id)}</td><td>${O.moves[b.id].state==='staged'?'Embarque':'Rack '+O.moves[b.id].rack}</td></tr>`).join('')}</table></div><label style="margin:10px 0;display:block">Andén de salida (1-3)<select id="andsal"><option>1</option><option>2</option><option>3</option></select></label><label style="margin:10px 0;display:block"><input type="checkbox" id="loadcheck"> Verifiqué estiba, base, altura, film y vehículo.</label><button class="b" onclick="dispatchBest(${s})">Confirmar carga y salida</button></div>`}
+function dispatchBest(s){const p=bestLoad(ready(s));if(p.f<.9||!$('#loadcheck')?.checked||p.take.some(b=>O.moves[b.id].state!=='staged')){alert('Falta verificación física.');return}p.take.forEach(b=>{b.sent=1;O.moves[b.id].state='sent';evt(b,'Despachado')});const e={id:'EMB-'+String(S.emb.length+1).padStart(3,'0'),suc:s,take:p.take,kg:p.kg,m3:p.m3,fecha:new Date().toLocaleString('es-MX'),vehicle:p.v.name,andSal:+($('#andsal')?.value||1)};S.emb.push(e);saveState();saveOps();go(3);const r=$('#rel');r.style.display='block';$('#pr').style.display='inline-block';r.innerHTML=`<h2>Relación ${e.id}</h2>Destino: sucursal ${s} · <b>Andén de salida: ${e.andSal}</b> · ${esc(e.vehicle)} · ${e.fecha}<br>${p.kg.toFixed(0)} kg · ${p.m3.toFixed(2)} m³ · ${(p.f*100).toFixed(1)}%<div id="rq"></div><table><tr><th>Bulto</th><th>SKU</th><th>Piezas</th></tr>${p.take.map(b=>`<tr><td>${esc(b.id)}</td><td>${esc(b.sku)}</td><td>${b.n}</td></tr>`).join('')}</table>`;new QRCode($('#rq'),{text:JSON.stringify({e:e.id,s,a:e.andSal,bultos:p.take.length,kg:Math.round(p.kg)}),width:96,height:96})}
+embarcar=function(s){go(5);$('#op-suc').value=s;rVehicles();prepareBest(s)};
+function planOut(){const s=+$('#pred-suc').value,h=+$('#pred-out').value;O.plans=O.plans.filter(p=>p.s!==s);O.plans.push({s,h});saveOps();rPredict()}
+function delPlan(s){O.plans=O.plans.filter(p=>p.s!==s);saveOps();rPredict()}
+function rPredict(){if(!$('#pred-now'))return;const now=+$('#pred-now').value||10,threshold=Math.max(1,Math.min(100,+$('#pred-th').value||85));O.now=now;O.threshold=threshold;const current=Array.from({length:32},(_,i)=>reserved(i+1).slice()),rows=[];for(let h=now;h<=18;h++){for(const o of Object.values(S.ocs)){if(Math.max(now,o.ini+o.dur)===h)o.bultos.filter(b=>!received(b)&&!b.sent).forEach(b=>current[b.suc-1].push(b))}for(const p of O.plans.filter(p=>p.h===h)){const bs=current[p.s-1],plan=bestLoad(bs);if(plan.f>=.9)current[p.s-1]=bs.filter(b=>!plan.take.includes(b))}const counts=current.map(tar);rows.push({h,counts,total:counts.reduce((a,b)=>a+b,0),peak:Math.max(...counts)})}const peak=Math.max(...rows.map(r=>r.peak)),alerts=[];for(let i=0;i<32;i++){const r=rows.find(r=>r.counts[i]/32*100>=threshold);if(r)alerts.push({r:i+1,h:r.h,n:r.counts[i]})}$('#pred-k').innerHTML=`<div><b>${alerts.length}</b>racks en alerta</div><div><b>${Math.round(peak/32*100)}%</b>máximo previsto</div><div><b>${Math.max(...rows.map(r=>r.total))}/1024</b>tarimas pico</div>`;const scale=Math.max(100,peak/32*100);$('#pred-chart').innerHTML='<h3>Mayor ocupación prevista</h3><div class="forecast">'+rows.map(r=>`<div><span>${Math.round(r.peak/32*100)}%</span><i class="${r.peak/32*100>=threshold?'hot':''}" style="height:${r.peak/32*100/scale*135}px"></i><span>${r.h}:00</span></div>`).join('')+'</div>';$('#pred-alerts').innerHTML=alerts.length?alerts.map(a=>`<div class="opnote"><b>Rack ${a.r}: ${a.n}/32 a las ${a.h}:00</b><br>Revisar salida anticipada, cross-docking o espacio alternativo.</div>`).join(''):'<p class="ok">Sin alertas con los datos actuales.</p>';$('#pred-plans').innerHTML=O.plans.map(p=>`<span class="pill">Sucursal ${p.s} · ${p.h}:00 <button onclick="delPlan(${p.s})">×</button></span>`).join(' ');saveOps()}
+function demoForecast(){if(S.ocs['OC-PRED']){alert('El escenario ya existe.');return}let slot;for(let a=1;a<=4&&!slot;a++)for(let h=10;h<18&&!slot;h++)if(!S.citas.some(c=>c.and===a&&h<c.ini+c.dur&&c.ini<h+1))slot={a,h};if(!slot){alert('No hay andén libre.');return}addCita({prov:'Proveedor simulado',oc:'OC-PRED',fol:'F-PRED',and:slot.a,ini:slot.h,dur:1});for(let i=0;i<40;i++)addBulto('OC-PRED',{sku:'SKU-PRED',prod:'Carga simulada',suc:14,n:10,kg:900,m3:1.8});render();go(6)}
+const simFields=[['trucks','Camiones/día',35],['hours','Horas de operación',10],['baseD','Andenes base',4],['newD','Andenes propuesta',4],['baseT','Descarga base (min)',80],['newT','Descarga propuesta (min)',65],['baseCross','Cross-docking base (%)',0],['newCross','Cross-docking propuesta (%)',25],['bultos','Bultos por camión',100]];
+function sim(d,t,h,n){const free=Array(d).fill(0);let wait=0,done=0,peak=0;for(let i=0;i<n;i++){const a=i*h*60/n,j=free.indexOf(Math.min(...free)),start=Math.max(a,free[j]);wait+=start-a;peak=Math.max(peak,start-a);free[j]=start+t;if(free[j]<=h*60)done++}return{done,wait:wait/n,peak,extra:Math.max(0,Math.max(...free)-h*60),util:n*t/(d*h*60)*100}}
+function rSim(){const x=Object.fromEntries(simFields.map(([k])=>[k,+$('#sim-'+k).value]));if(Object.values(x).some(v=>!Number.isFinite(v)||v<0)||!Number.isInteger(x.trucks)||x.trucks<1||x.trucks>10000||x.hours<=0||![x.baseD,x.newD].every(v=>Number.isInteger(v)&&v>=1&&v<=100)||x.baseT<60||x.newT<60||x.baseCross>100||x.newCross>100){$('#sim-results').textContent='Revisa valores.';return}const a=sim(x.baseD,x.baseT,x.hours,x.trucks),b=sim(x.newD,x.newT,x.hours,x.trucks);const rows=[['Camiones terminados',a.done,b.done],['Camiones pendientes',x.trucks-a.done,x.trucks-b.done],['Espera media (min)',a.wait.toFixed(1),b.wait.toFixed(1)],['Espera máxima (min)',a.peak.toFixed(1),b.peak.toFixed(1)],['Minutos fuera de turno',a.extra.toFixed(1),b.extra.toFixed(1)],['Demanda de andenes (%)',a.util.toFixed(1),b.util.toFixed(1)],['Movimientos estimados',Math.round(x.trucks*x.bultos*(2-x.baseCross/100)),Math.round(x.trucks*x.bultos*(2-x.newCross/100))]];$('#sim-results').innerHTML='<div class="tw"><table><tr><th>Indicador</th><th>Base</th><th>Propuesta</th></tr>'+rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')+'</table></div><p class="s">Supuestos: llegadas uniformes, duración constante. Simulación, no observación real.</p>'}
+$('#sim-inputs').innerHTML=simFields.map(([k,l,v])=>`<label>${l}<input type="number" id="sim-${k}" value="${v}" min="0"></label>`).join('');for(const id of ['#op-suc','#pred-suc'])$(id).innerHTML=Array.from({length:32},(_,i)=>`<option>${i+1}</option>`).join('');for(const id of ['#pred-now','#pred-out'])$(id).innerHTML=Array.from({length:11},(_,i)=>`<option value="${i+8}">${i+8}:00</option>`).join('');$('#pred-now').value=10;$('#pred-out').value=13;
+const oldRender=render;render=function(){oldRender();rOps();rPredict();rSim();pushState()};
+const oldReset=resetAll;resetAll=async function(){try{await fetch(SYNC_URL+'/api/reset',{method:'POST',signal:AbortSignal.timeout(1500)})}catch(e){}localStorage.removeItem(OPSKEY);oldReset()};
+
+/* ---- SYNC OPCIONAL CON BACKEND (server_worker.py) ---- */
+const SYNC_URL=new URLSearchParams(location.search).get('backend')||'http://localhost:8000';
+let lastSyncTs=0,SYNCING=false,lastPushed='';
+const findBulto=id=>allB().find(x=>x.id===id);
+function taskList(){
+  return allB().filter(b=>received(b)&&!b.sent&&['pending','cross'].includes(O.moves[b.id]?.state)&&(O.moves[b.id].state==='cross'||O.moves[b.id].rack)).map(b=>{
+    const m=O.moves[b.id],o=S.ocs[b.oc],cross=m.state==='cross';
+    return{code:'T-'+b.id,kind:cross?'cross':'almacenamiento',origin:'Andén recepción 0'+o.and,
+      destination:cross?'Zona embarque · Sucursal '+b.suc:'Rack '+m.rack+' (sucursal '+b.suc+')',
+      bulto:b.id,sku:b.sku,pieces:b.n,weight:b.kg,status:'pendiente'}});
+}
+async function pushState(){
+  const body=JSON.stringify({bultos:allB().map(b=>({id:b.id,oc:b.oc,sku:b.sku,n:b.n,suc:b.suc,received:received(b)})),tasks:taskList()});
+  if(body===lastPushed)return;
+  try{const r=await fetch(SYNC_URL+'/api/state',{method:'POST',headers:{'Content-Type':'application/json'},body,signal:AbortSignal.timeout(2500)});if(r.ok)lastPushed=body}catch(e){}
+}
+async function syncFromBackend(){
+  const panel=$('#sync-panel');
+  try{
+    const r=await fetch(SYNC_URL+'/api/events?since='+lastSyncTs,{signal:AbortSignal.timeout(2500)});
+    if(!r.ok)throw new Error('bad status');
+    const data=await r.json(),evs=data.events||[];
+    panel.className='on';panel.textContent='🟢 Backend conectado · '+evs.length+' eventos nuevos';
+    for(const e of evs){
+      if(e.id)lastSyncTs=Math.max(lastSyncTs,e.id);
+      if(e.type==='scan'){
+        const b=findBulto(e.package_code);
+        if(b&&!received(b)){SYNCING=true;try{scan(payload(b),b.oc)}finally{SYNCING=false}}
+      }else if(e.type==='task'&&e.action==='deliver'){
+        confirmMove(e.bulto);
+      }else if(e.type==='incident'){
+        const b=findBulto(e.bulto);if(b)evt(b,'Incidencia: '+e.text);
+        $('#op-msg').textContent='⚠ Incidencia en '+e.bulto+': '+e.text;
+      }
+    }
+    if(evs.length){rRec();rOps()}
+    pushState();
+  }catch(e){
+    lastPushed='';
+    panel.className='err';panel.textContent='⚪ Offline (localStorage)';
+  }
+}
+setInterval(syncFromBackend,3000);
+
+loadState();loadOps();go(0);syncFromBackend();
+</script></body></html>
